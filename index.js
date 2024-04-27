@@ -12,7 +12,7 @@ app.use(express.json());
 // MongoDB
 
 const uri = `mongodb+srv://${process.env.AG_USER}:${process.env.AG_PASSWORD}@cluster0.rtcbpiy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-// const uri = `mongodb+srv://artscapeGallery:fsLegvruCn7rvo7y@cluster0.rtcbpiy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+
 console.log(uri);
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -34,6 +34,14 @@ async function run() {
 
     app.post("/craft", async (req, res) => {
       const card = req.body;
+      const result = await craftCollection.insertOne(card);
+      res.send(result);
+    });
+
+    app.get("/allCraft", async (req, res) => {
+      const cursor = craftCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
