@@ -26,11 +26,60 @@ const client = new MongoClient(uri, {
 
 const database = client.db("craftDB");
 const craftCollection = database.collection("craftCollection");
+const categoryCollection = database.collection("categoryCollection");
 
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    // await categoryCollection.insertMany([
+    //   {
+    //     subcategory_name: "Landscape Painting",
+    //     image: "https://i.ibb.co/WGJGPnz/landscape-painting.jpg",
+    //     difficulty: "Intermediate",
+    //     description: "Capture the beauty of natural landscapes on canvas.",
+    //     materials: ["Canvas", "Oil paints", "Paintbrushes"],
+    //   },
+    //   {
+    //     subcategory_name: "Portrait Drawing",
+    //     image: "https://i.ibb.co/1GGVYt8/portrait-drawing.jpg",
+    //     difficulty: "Beginner to Advanced",
+    //     description:
+    //       "Create detailed portraits using various drawing techniques.",
+    //     materials: ["Drawing paper", "Pencils", "Ink", "Acrylic paints"],
+    //   },
+    //   {
+    //     subcategory_name: "Watercolour Painting",
+    //     image: "https://i.ibb.co/fC5cjst/water-color-paint.webp",
+    //     difficulty: "Beginner to Intermediate",
+    //     description:
+    //       "Explore the transparency and fluidity of watercolor paints.",
+    //     materials: ["Watercolor paper", "Watercolor paints", "Paintbrushes"],
+    //   },
+    //   {
+    //     subcategory_name: "Oil Painting",
+    //     image: "https://i.ibb.co/bd76k0y/oil-paint.jpg",
+    //     difficulty: "Intermediate to Advanced",
+    //     description: "Create rich and vibrant artworks with oil paints.",
+    //     materials: ["Canvas", "Oil paints", "Palette knives", "Turpentine"],
+    //   },
+    //   {
+    //     subcategory_name: "Charcoal Sketching",
+    //     image: "https://i.ibb.co/Ld5fQc7/carosel-art.jpg",
+    //     difficulty: "Beginner to Intermediate",
+    //     description: "Master the art of expressive sketching with charcoal.",
+    //     materials: ["Drawing paper", "Charcoal sticks", "Kneaded eraser"],
+    //   },
+    //   {
+    //     subcategory_name: "Cartoon Drawing",
+    //     image: "https://i.ibb.co/2F3mLDz/cartoon.jpg",
+    //     difficulty: "Beginner to Advanced",
+    //     description:
+    //       "Create whimsical characters and stories through cartooning.",
+    //     materials: ["Drawing paper", "Pencils", "Markers"],
+    //   },
+    // ]);
 
     app.post("/craft", async (req, res) => {
       const card = req.body;
@@ -62,6 +111,33 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await craftCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    app.get("/categoryCard", async (req, res) => {
+      const cursor = categoryCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.put("/updateCraft/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updatedCraft = req.body;
+      const craft = {
+        $set: {
+          image: updatedCraft.image,
+          item_name: updatedCraft.item_name,
+          subcategory_name: updatedCraft.subcategory_name,
+          short_description: updatedCraft.short_description,
+          processing_time: updatedCraft.processing_time,
+          customization: updatedCraft.customization,
+          price: updatedCraft.price,
+          rating: updatedCraft.rating,
+          stock_status: updatedCraft.stock_status,
+        },
+      };
+      const result = await craftCollection.updateOne(query, craft);
       res.send(result);
     });
 
